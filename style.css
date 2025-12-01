@@ -1,3 +1,9 @@
+@font-face {
+	font-family: “Pudelinka”;
+	src: url(”Fonts/pudelinka.ttf” ) format('truetype’);
+	font-weight: normal;
+	font-style: normal;
+}
 body{
 	blockquote.q {
 	color: #D4AF37;
@@ -11,3 +17,4 @@ body{
 	padding: 10px 10px 10px 10px;
 	font-family: sans serif;
     }
+p.quote { font-family: “Pudelinka”, cursive;}
