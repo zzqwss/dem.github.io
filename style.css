@@ -8,6 +8,13 @@ css
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Pudelinka';
+  src: url('fonts/Pudelinka.woff2') format('woff2'),
+       url('fonts/Pudelinka.woff') format('woff');
+  font-display: swap;
+} 
+
 body {
 	background-color: #fff8e1;
 	color: #ffd700
