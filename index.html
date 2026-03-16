@@ -6,6 +6,45 @@
   <link rel=“stylesheet” href=“style.css” />
 </head>
   <title>Привет мир</title>
+  <h2> 16 марта , 2026</h2
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+# =============================================================================
+# 1. ЗАГРУЗКА И ПОДГОТОВКА ДАННЫХ
+# =============================================================================
+
+def load_data(filepath):
+    """Загружает данные из CSV файла"""
+    try:
+        dataset = pd.read_csv(filepath, sep=';', decimal=',')
+        print(f"✅ Данные загружены: {len(dataset)} записей")
+        return dataset
+    except FileNotFoundError:
+        print("❌ Файл не найден. Создаю демонстрационные данные...")
+        # Демонстрационные данные (если файл не найден)
+        data = {
+            'Часы': [2.3, 4.9, 3.1, 8.5, 3.4, 1.5, 9.2, 5.5, 8.3, 2.7, 
+                     7.7, 5.9, 4.5, 3.3, 1.0, 8.9, 2.7],
+            'Полученные. Баллы': [23, 47, 28, 76, 30, 21, 88, 60, 81, 25, 
+                                  85, 62, 41, 42, 17, 95, 30]
+        }
+        return pd.DataFrame(data)
+
+def prepare_features(dataset):
+    """Подготавливает признаки (X) и целевую переменную (Y)"""
+    X = dataset[['Часы']]
+    Y = dataset['Полученные. Баллы']
+    return X, Y
+
+# =============================================================================
+# 2. ОБУЧЕНИЕ МОДЕЛИ
+# =============================================================================
+
   <h2> 17 февраля , 2026</h2>
   <img src="7d389800ee149e81c55e66fdf077b509.jpg">
   <!DOCTYPE html>
