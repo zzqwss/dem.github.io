@@ -8,192 +8,69 @@
   <title>Привет мир</title>
 </head>
   <h2> 16 марта , 2026</h2
+# 1. Импорт библиотек
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, r2_score
 
-# =============================================================================
-# 1. ЗАГРУЗКА И ПОДГОТОВКА ДАННЫХ
-# =============================================================================
+# 2. Создание данных
+data = {
+    'Часы': [2.3, 4.9, 3.1, 8.5, 3.4, 1.5, 9.2, 5.5, 8.3, 2.7, 7.7, 5.9, 4.5, 3.3, 1.0, 8.9, 2.7],
+    'Полученные. Баллы': [23, 47, 28, 76, 30, 21, 88, 60, 81, 25, 85, 62, 41, 42, 17, 95, 30]
+}
+dataset = pd.DataFrame(data)
 
-def load_data(filepath):
-    """Загружает данные из CSV файла"""
-    try:
-        dataset = pd.read_csv(filepath, sep=';', decimal=',')
-        print(f"✅ Данные загружены: {len(dataset)} записей")
-        return dataset
-    except FileNotFoundError:
-        print("❌ Файл не найден. Создаю демонстрационные данные...")
-        # Демонстрационные данные (если файл не найден)
-        data = {
-            'Часы': [2.3, 4.9, 3.1, 8.5, 3.4, 1.5, 9.2, 5.5, 8.3, 2.7, 
-                     7.7, 5.9, 4.5, 3.3, 1.0, 8.9, 2.7],
-            'Полученные. Баллы': [23, 47, 28, 76, 30, 21, 88, 60, 81, 25, 
-                                  85, 62, 41, 42, 17, 95, 30]
-        }
-        return pd.DataFrame(data)
+# 3. Подготовка данных
+X = dataset[['Часы']]
+Y = dataset['Полученные. Баллы']
 
-def prepare_features(dataset):
-    """Подготавливает признаки (X) и целевую переменную (Y)"""
-    X = dataset[['Часы']]
-    Y = dataset['Полученные. Баллы']
-    return X, Y
+# 4. Разделение на обучающую и тестовую выборки
+X_train, X_test, Y_train, Y_test = train_test_split(
+    X, Y,
+    test_size=0.2,
+    random_state=42,
+    shuffle=True
+)
 
-# =============================================================================
-# 2. ОБУЧЕНИЕ МОДЕЛИ
-# =============================================================================
+# 5. Обучение модели
+regressor = LinearRegression()
+regressor.fit(X_train, Y_train)
 
-def train_model(X, Y):
-    """Разделяет данные и обучает модель линейной регрессии"""
-    # Разделение на обучающую и тестовую выборки (80/20)
-    X_train, X_test, Y_train, Y_test = train_test_split(
-        X, Y, 
-        test_size=0.2, 
-        random_state=42, 
-        shuffle=True
-    )
-    
-    # Создание и обучение модели
-    regressor = LinearRegression()
-    regressor.fit(X_train, Y_train)
-    
-    print(f"✅ Модель обучена на {len(X_train)} примерах")
-    return regressor, X_train, X_test, Y_train, Y_test
+# 6. Параметры модели
+print("=== ПАРАМЕТРЫ МОДЕЛИ ===")
+print(f"Уравнение: Y = {regressor.coef_[0]:.2f} * X + {regressor.intercept_:.2f}")
+print()
 
-# =============================================================================
-# 3. ОЦЕНКА КАЧЕСТВА
-# =============================================================================
+# 7. Прогноз для 17 часов
+print("=== ПРОГНОЗ ===")
+new_student = pd.DataFrame({'Часы': [17]})
+prediction = regressor.predict(new_student)
+print(f"Студент занимался 17 часов")
+print(f"Прогноз баллов: {prediction[0]:.2f}")
+print()
 
-def evaluate_model(regressor, X_test, Y_test):
-    """Вычисляет метрики качества модели"""
-    Y_pred = regressor.predict(X_test)
-    
-    mae = mean_absolute_error(Y_test, Y_pred)
-    mse = mean_squared_error(Y_test, Y_pred)
-    rmse = np.sqrt(mse)
-    r2 = r2_score(Y_test, Y_pred)
-    
-    print("\n" + "="*50)
-    print("📊 МЕТРИКИ КАЧЕСТВА МОДЕЛИ")
-    print("="*50)
-    print(f"MAE (Средняя абсолютная ошибка): {mae:.4f}")
-    print(f"MSE (Среднеквадратичная ошибка): {mse:.4f}")
-    print(f"RMSE (Корень из MSE):            {rmse:.4f}")
-    print(f"R² (Коэффициент детерминации):   {r2:.4f} ({r2*100:.2f}%)")
-    print("="*50)
-      return {'MAE': mae, 'MSE': mse, 'RMSE': rmse, 'R2': r2}
+# 8. Несколько прогнозов для сравнения
+print("=== НЕСКОЛЬКО ПРОГНОЗОВ ===")
+students = pd.DataFrame({'Часы': [1, 3, 5, 7, 10, 15, 17]})
+predictions = regressor.predict(students)
 
-# =============================================================================
-# 4. ПРОГНОЗИРОВАНИЕ
-# =============================================================================
+results = pd.DataFrame({
+    'Часы подготовки': students['Часы'],
+    'Прогноз баллов': predictions.round(2)
+})
+print(results)
+print()
 
-def make_predictions(regressor, hours_list):
-    """Делает прогнозы для указанного количества часов"""
-    X_new = pd.DataFrame({'Часы': hours_list})
-    predictions = regressor.predict(X_new)
-    
-    results = pd.DataFrame({
-        'Часы подготовки': hours_list,
-        'Прогноз баллов': np.round(predictions, 2)
-    })
-    
-    return results
+# 9. Оценка качества модели
+Y_pred = regressor.predict(X_test)
+mae = mean_absolute_error(Y_test, Y_pred)
+r2 = r2_score(Y_test, Y_pred)
+print("=== КАЧЕСТВО МОДЕЛИ ===")
+print(f"MAE: {mae:.2f}")
+print(f"R²: {r2:.2f}")
 
-# =============================================================================
-# 5. ВИЗУАЛИЗАЦИЯ
-# =============================================================================
-
-def plot_results(X, Y, regressor, X_train, X_test, Y_train, Y_test):
-    """Строит график с данными и линией регрессии"""
-    plt.figure(figsize=(12, 7))
-    
-    # Точки обучающей выборки
-    plt.scatter(X_train, Y_train, color='blue', alpha=0.6, 
-                label=f'Обучающие данные (n={len(X_train)})', s=100)
-    
-    # Точки тестовой выборки
-    plt.scatter(X_test, Y_test, color='red', alpha=0.8, 
-                label=f'Тестовые данные (n={len(X_test)})', s=100, marker='s')
-    
-    # Линия регрессии
-    X_line = np.linspace(X.min(), X.max(), 100).reshape(-1, 1)
-    plt.plot(X_line, regressor.predict(X_line), color='green', 
-             linewidth=3, label='Линия регрессии')
-    
-    plt.title('📈 Зависимость баллов от часов практики', fontsize=16, fontweight='bold')
-    plt.xlabel('⏱️ Часы практики', fontsize=14)
-    plt.ylabel('🎯 Полученные баллы', fontsize=14)
-    plt.legend(fontsize=12)
-    plt.grid(True, alpha=0.3, linestyle='--')
-    plt.tight_layout()
-    
-    # Сохранение графика
-    plt.savefig('regression_plot.png', dpi=300, bbox_inches='tight')
-    print("✅ График сохранён как 'regression_plot.png'")
-    
-    plt.show()
-
-# =============================================================================
-# 6. ГЛАВНАЯ ФУНКЦИЯ
-# =============================================================================
-
-def main():
-    """Основная функция запуска"""
-    print("\n" + "="*60)
-    print("🚀 ЗАПУСК МОДЕЛИ ЛИНЕЙНОЙ РЕГРЕССИИ")
-      print("="*60 + "\n")
-    
-    # Загрузка данных
-    dataset = load_data(r'Downloads/task_regression.csv')
-    
-    # Подготовка
-    X, Y = prepare_features(dataset)
-    
-    # Обучение
-    regressor, X_train, X_test, Y_train, Y_test = train_model(X, Y)
-    
-    # Параметры модели
-    print("\n" + "="*50)
-    print("⚙️ ПАРАМЕТРЫ МОДЕЛИ")
-    print("="*50)
-    print(f"Уравнение: Y = {regressor.coef_[0]:.4f} * X + {regressor.intercept_:.4f}")
-    print(f"Интерпретация: Каждый дополнительный час практики")
-    print(f"              добавляет ~{regressor.coef_[0]:.2f} баллов")
-    print("="*50)
-      
-    # Оценка качества
-    metrics = evaluate_model(regressor, X_test, Y_test)
-    
-    # Прогнозы
-    print("\n" + "="*50)
-    print("🔮 ПРОГНОЗЫ МОДЕЛИ")
-    print("="*50)
-    
-    # Прогноз для 17 часов (для сайта)
-    prediction_17 = make_predictions(regressor, [17])
-    print("\n Прогноз для публикации на сайте:")
-    print(prediction_17.to_string(index=False))
-    
-    # Несколько прогнозов для сравнения
-    print("\n📋 Прогнозы для разных значений:")
-    predictions_table = make_predictions(regressor, [1, 3, 5, 7, 10, 15, 17])
-    print(predictions_table.to_string(index=False))
-    
-    # Визуализация
-    print("\n" + "="*50)
-    print("📊 ВИЗУАЛИЗАЦИЯ")
-    print("="*50)
-    plot_results(X, Y, regressor, X_train, X_test, Y_train, Y_test)
-    
-    print("\n" + "="*60)
-    print("✅ ВСЕ ВЫЧИСЛЕНИЯ ЗАВЕРШЕНЫ УСПЕШНО!")
-    print("="*60 + "\n")
-
-if __name__ == "__main__":
-    main()
     <head>
   <h2> 17 февраля , 2026</h2>
   <img src="7d389800ee149e81c55e66fdf077b509.jpg">
