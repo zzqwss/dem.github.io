@@ -9,98 +9,18 @@
 </head>
   <h2> 25 марта , 2026</h2
   <tittle>показатель точности модели по выдаче кредита: 0.69 (69%)</tittle>
-  # casco_credit_model.py
-# Модель страхования КАСКО - точность принятия решений
-
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-import joblib
-import json
-
-# ═══════════════════════════════════════════════════════════════
-# 1. ГЕНЕРАЦИЯ ДАТАСЕТА
-# ═══════════════════════════════════════════════════════════════
-
-np.random.seed(42)
-n_samples = 1000
-
-# Признаки: возраст, стаж вождения, число ДТП
-age = np.clip(np.random.normal(35, 12, n_samples), 18, 75).astype(int)
-driving_experience = np.clip(np.random.normal(10, 7, n_samples), 0, age - 18)
-num_accidents = np.clip(np.random.poisson(0.8, n_samples), 0, 10)
-
-# Целевая переменная: одобрение КАСКО
-def calc_probability(age, exp, accidents):
-    prob = 0.5
-    if 25 <= age <= 60: prob += 0.2
-    elif age < 21: prob -= 0.3
-    prob += min(exp * 0.03, 0.25)
-    prob -= accidents * 0.15
-    if accidents >= 5: prob -= 0.3
-    return np.clip(prob, 0.05, 0.95)
-
-probs = [calc_probability(a, e, d) for a, e, d in zip(age, driving_experience, num_accidents)]
-casco_approved = np.random.binomial(1, probs)
-
-# Сохранение датасета
-df = pd.DataFrame({
-    'age': age,
-    'driving_experience_years': np.round(driving_experience, 1),
-    'num_accidents': num_accidents,
-    'casco_approved': casco_approved
-})
-df.to_csv('casco_dataset.csv', index=False, encoding='utf-8-sig')
-
-# ═══════════════════════════════════════════════════════════════
-# 2. ОБУЧЕНИЕ МОДЕЛИ
-# ═══════════════════════════════════════════════════════════════
-
-X = df[['age', 'driving_experience_years', 'num_accidents']]
-y = df['casco_approved']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-# ═══════════════════════════════════════════════════════════════
-# 3. РАСЧЁТ МЕТРИК
-# ═══════════════════════════════════════════════════════════════
-
-y_pred = model.predict(X_test)
-accuracy = round(accuracy_score(y_test, y_pred), 2)
-
-metrics = {
-    'accuracy': accuracy,
-    'accuracy_percent': f"{accuracy * 100}%",
-    'train_size': int(len(y_train)),
-    'test_size': int(len(y_test)),
-    'model_type': 'Random Forest'
-}
-
-with open('metrics.json', 'w', encoding='utf-8') as f:
-    json.dump(metrics, f, ensure_ascii=False, indent=2)
-
-joblib.dump(model, 'casco_model.pkl')
-
-# ═══════════════════════════════════════════════════════════════
-# 4. ВЫВОД РЕЗУЛЬТАТОВ
-# ═══════════════════════════════════════════════════════════════
-
-print("\n" + "═" * 60)
-print("🚗 МОДЕЛЬ СТРАХОВАНИЯ КАСКО")
-print("═" * 60)
-print(f"📊 Датасет: casco_dataset.csv ({len(df)} записей)")
-print(f"🤖 Модель: casco_model.pkl")
-print(f"📈 Обучающая выборка: {len(y_train)} записей")
-print(f"📉 Тестовая выборка: {len(y_test)} записей")
-print("─" * 60)
-print(f"🎯 ПОКАЗАТЕЛЬ ТОЧНОСТИ МОДЕЛИ ПО ВЫДАЧЕ КРЕДИТА: {accuracy} ({accuracy * 100}%)")
-print("─" * 60)
-print(f"✅ Метрики сохранены: metrics.json")
-print("═" * 60 + "\n")
+  <tittle>════════════════════════════════════════════
+🚗 МОДЕЛЬ СТРАХОВАНИЯ КАСКО
+════════════════════════════════════════════
+📊 Датасет: casco_dataset.csv (1000 записей)
+🤖 Модель: casco_model.pkl
+📈 Обучающая выборка: 800 записей
+📉 Тестовая выборка: 200 записей
+────────────────────────────────────────────
+🎯 ПОКАЗАТЕЛЬ ТОЧНОСТИ МОДЕЛИ ПО ВЫДАЧЕ КРЕДИТА: 0.69 (69%)
+────────────────────────────────────────────
+✅ Метрики сохранены: metrics.json
+════════════════════════════════════════════<tittle>
   <h2> 16 марта , 2026</h2>
   <p>=== ПРОГНОЗ ===
 Студент занимался 17 часов
